@@ -4,7 +4,10 @@ import {EffectComposer} from 'three/examples/jsm/postprocessing/EffectComposer';
 import {RenderPass} from 'three/examples/jsm/postprocessing/RenderPass';
 import {UnrealBloomPass} from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import {OutputPass} from 'three/examples/jsm/postprocessing/OutputPass';
+import objects from './lib'
 
+
+const points = objects.points;
 const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
@@ -45,6 +48,26 @@ bloomComposer.addPass(outputPass);
 
 camera.position.set(0, -2, 14);
 camera.lookAt(0, 0, 0);
+const Di = {
+	merge: function(e) {
+		for (var t = {}, i = 0; i < e.length; i++) {
+			var n = this.clone(e[i]);
+			for (var r in n)
+				t[r] = n[r]
+		}
+		return t
+	},
+	clone: function(e) {
+		var t = {};
+		for (var i in e)
+			for (var n in t[i] = {},
+			e[i]) {
+				var r = e[i][n];
+				r && (r.isColor || r.isMatrix3 || r.isMatrix4 || r.isVector2 || r.isVector3 || r.isVector4 || r.isTexture) ? t[i][n] = r.clone() : Array.isArray(r) ? t[i][n] = r.slice() : t[i][n] = r
+			}
+		return t
+	}
+}
 
 const uniforms = {
 	u_time: {type: 'f', value: 0.0},
@@ -59,9 +82,11 @@ const mat = new THREE.ShaderMaterial({
 	vertexShader: document.getElementById('vertexshader').textContent,
 	fragmentShader: document.getElementById('fragmentshader').textContent
 });
-
-const geo = new THREE.IcosahedronGeometry(4, 30 );
+// const mat = new THREE.ShaderMaterial(points);
+// Создаем геометрию куба с большим количеством сегментов
+const geo = new THREE.BoxGeometry(4, 4, 4, 20, 20, 20);
 const mesh = new THREE.Mesh(geo, mat);
+
 scene.add(mesh);
 mesh.material.wireframe = true;
 
@@ -119,7 +144,7 @@ function animate() {
 	camera.position.y += (-mouseY - camera.position.y) * 0.5;
 	camera.lookAt(scene.position);
 	uniforms.u_time.value = clock.getElapsedTime();
-	uniforms.u_frequency.value = analyser.getAverageFrequency();
+	points.u_frequency.value = analyser.getAverageFrequency()/2;
     bloomComposer.render();
 	requestAnimationFrame(animate);
 }
