@@ -1,6 +1,6 @@
 # audiovisualizer
 
-"How To Create A 3D Audio Visualizer Using Three.js" YouTube tutorial project files https://youtu.be/qDIF2z_VtHs
+
 
 1. Clone the repository;
 2. Open the folder in Visual Studio Code;

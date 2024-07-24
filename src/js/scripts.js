@@ -5,7 +5,6 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass";
 import { GlitchPass } from "three/examples/jsm/postprocessing/GlitchPass";
-import objects from "./lib";
 
 const fragment = `
 uniform vec3 u_baseColor;
@@ -125,7 +124,6 @@ void main() {
     vec3 newPosition = position + normal * displacement;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
 }`;
-const points = objects.points;
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
@@ -165,9 +163,6 @@ bloomComposer.addPass(bloomPass);
 const outputPass = new OutputPass();
 bloomComposer.addPass(outputPass);
 
-// Добавляем GlitchPass
-// const glitchPass = new GlitchPass();
-// bloomComposer.addPass(glitchPass);
 
 camera.position.set(0, -2, 14);
 camera.lookAt(0, 0, 0);
@@ -187,15 +182,7 @@ const uniforms = {
   u_baseColor: { type: "v3", value: new THREE.Color(0xffffff) },
   u_waveColor: { type: "v3", value: new THREE.Color(0x0000ff) },
 };
-// const mat = new THREE.ShaderMaterial({
-//   uniforms,
-//   vertexShader: vertex,
-//   fragmentShader: fragment,
-// });
 
-// Создаем геометрию куба с большим количеством сегментов
-// const geo = new THREE.BoxGeometry(4, 4, 4, 20, 20, 20);
-// const mesh = new THREE.Mesh(geo, mat);
 const mat = new THREE.ShaderMaterial({
   uniforms,
   vertexShader: vertex,
@@ -203,7 +190,7 @@ const mat = new THREE.ShaderMaterial({
   wireframe: true,
 });
 
-const geo = new THREE.BoxGeometry(4, 4, 4, 20, 20, 20);
+const geo = new THREE.BoxGeometry(4, 4, 4, 80, 80, 80);
 const mesh = new THREE.Mesh(geo, mat);
 scene.add(mesh);
 mesh.material.wireframe = true;
@@ -223,15 +210,6 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 directionalLight.castShadow = true;
 mesh.castShadow = true;
 mesh.receiveShadow = true;
-
-// Создаем плоскость для отображения теней
-const planeGeometry = new THREE.PlaneGeometry(20, 20);
-const planeMaterial = new THREE.MeshPhongMaterial({ color: 0xcccccc });
-const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-plane.rotation.x = -Math.PI / 2;
-plane.position.y = -3;
-plane.receiveShadow = true;
-// scene.add(plane);
 
 const listener = new THREE.AudioListener();
 camera.add(listener);
